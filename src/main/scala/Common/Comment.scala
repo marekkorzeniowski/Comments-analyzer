@@ -5,9 +5,10 @@ import java.time.{LocalDate, LocalTime}
 case class Comment(
                   postId: Int,
                   score: Int,
-                  text: String,
-                  creationDate: LocalDate,
-                  creationTime: LocalTime
+                  sentiment: String,
+                  text: String
+//                  creationDate: LocalDate,
+//                  creationTime: LocalTime
                   )
 
 
