@@ -47,7 +47,11 @@ libraryDependencies ++= Seq(
   "org.apache.kafka" % "kafka-streams" % kafkaVersion,
 
   //spark-xml-parser
-  "com.databricks"%"spark-xml_2.12"%"0.6.0"
+  "com.databricks"%"spark-xml_2.12"%"0.6.0",
+
+  //minio-s3
+  "org.apache.hadoop" % "hadoop-aws" % "2.7.4",
+  "com.amazonaws" % "aws-java-sdk" % "1.7.4"
 
 )
 

@@ -28,9 +28,10 @@ object Producer {
            lines.foreach { line =>
              val data = new ProducerRecord[String, String](topic, "Comment", line)
              producer.send(data)
-             Thread.sleep(1000)
+             Thread.sleep(50)
            }
            producer.close()
+           println("Second thread finished")
          }).start()
   }
 
