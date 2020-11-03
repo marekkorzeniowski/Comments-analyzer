@@ -1,9 +1,6 @@
 package Spark_App
 
-import java.io.File
-
 import Common.Comment
-import Kafka.Producer
 import NLP.SentimentAnalysis
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.apache.spark.sql.SparkSession
@@ -32,11 +29,13 @@ object Consumer {
 
   val ssc = new StreamingContext(spark.sparkContext, Seconds(5))
 
-
+//  classOf[StringDeserializer]       // "org.apache.kafka.common.serialization.StringDeserializer"
   val kafkaParams: Map[String, Object] = Map(
     "bootstrap.servers" -> s"$KAFKA_HOST:$KAFKA_PORT",
+//    "key.serializer" -> classOf[StringSerializer], // send data to kafka
+//    "value.serializer" -> classOf[StringSerializer],
     "key.deserializer" -> classOf[StringDeserializer], // receiving data from kafka
-    "value.deserializer" -> classOf[StringDeserializer],
+    "value.deserializer" -> classOf[StringDeserializer] ,
     "auto.offset.reset" -> "latest",
     "enable.auto.commit" -> false.asInstanceOf[Object]
   )
@@ -44,7 +43,7 @@ object Consumer {
 
   def readFromKafka() = {
 
-    Producer.dataProducer() //3 TODO! Remove this in remote environment
+//    Producer.dataProducer() //3 TODO! Remove this in remote environment
 
     val topics = Array(KAFKA_TOPIC)
     val kafkaDStream = KafkaUtils.createDirectStream(
@@ -73,27 +72,30 @@ object Consumer {
 
   import spark.implicits._
 
-  def saveAsCsv() = { //4 TODO! Replace with S3 URL
+  def saveAsCsv(path: String): Unit = { //4 TODO! Replace with S3 URL
     readFromKafka().foreachRDD { rdd =>
       val ds = spark.createDataset(rdd) // encoder required (Encoders.product[Class]) or import spark.implicits._
-      val f = new File("/home/marek/Repos/Comments-analyzer/src/main/resources/data/comments") // only to inspect how many files inside
-      val nFiles = f.listFiles().length
-      val path = s"/home/marek/Repos/Comments-analyzer/src/main/resources/data/comments/comment$nFiles.csv"
-
+//      val f = new File("/home/marek/Repos/Comments-analyzer/src/main/resources/data/comments") // only to inspect how many files inside
+//      val nFiles = f.listFiles().length
+//
       ds.write.csv(path)
     }
   }
 
-  def saveToS3() = { //5 TODO! How save to S3???
-    ???
-  }
+//  def saveToS3() = { //5 TODO! How save to S3???
+//    ???
+//  }
 
 
   def main(args: Array[String]): Unit = {
 
+//    val path = s"/home/marek/Repos/Comments-analyzer/src/main/resources/data/comments/comment$nFiles.csv"
+
+//    val path = args(0)
+    println("Processing about to start")
     readFromKafka().print(1000)
 
-    //    saveAsCsv()
+//    saveAsCsv(path)
 
     ssc.start()
     ssc.awaitTermination()
