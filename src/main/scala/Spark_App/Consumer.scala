@@ -1,22 +1,21 @@
 package Spark_App
 
-import Common.Comment
-import NLP.SentimentAnalysis
+import Common.Comment.processComments
+import Common.Post.processPosts
+import Common.{Comment, Post, PostObject}
+import Kafka.Producer
 import org.apache.kafka.common.serialization.StringDeserializer
-import org.apache.spark.sql.SparkSession
+import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.{Encoders, SparkSession}
+import org.apache.spark.streaming.dstream.DStream
 import org.apache.spark.streaming.kafka010.{ConsumerStrategies, KafkaUtils, LocationStrategies}
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 
 import scala.xml.XML
 
 object Consumer {
-  //1 TODO - replace parameters below with args
 
-  val KAFKA_HOST = "localhost"
-  val KAFKA_PORT = "9092"
-  val KAFKA_TOPIC = "comment-analyzer"
-
-  val spark = SparkSession
+  val spark: SparkSession = SparkSession
     .builder()
     .appName("comment-analyzer")
     .master("local[2]") //2 TODO local[2] = appropriate for aws?
@@ -25,21 +24,12 @@ object Consumer {
 
   val ssc = new StreamingContext(spark.sparkContext, Seconds(5))
 
-//  classOf[StringDeserializer]       // "org.apache.kafka.common.serialization.StringDeserializer"
-  val kafkaParams: Map[String, Object] = Map(
-    "bootstrap.servers" -> s"$KAFKA_HOST:$KAFKA_PORT",
-    "key.deserializer" -> classOf[StringDeserializer], // receiving data from kafka
-    "value.deserializer" -> classOf[StringDeserializer] ,
-    "auto.offset.reset" -> "latest",
-    "enable.auto.commit" -> false.asInstanceOf[Object]
-  )
 
+  def readFromKafka(topic1: String, topic2: String, kafkaParams: Map[String, Object]): DStream[PostObject] = {
 
-  def readFromKafka() = {
+    Producer.dataProducer() //3 TODO! Remove this in remote environment
 
-//    Producer.dataProducer() //3 TODO! Remove this in remote environment
-
-    val topics = Array(KAFKA_TOPIC)
+    val topics = Array(topic1, topic2)
     val kafkaDStream = KafkaUtils.createDirectStream(
       ssc,
       LocationStrategies.PreferConsistent, //Distributes the partitions evenly across the Spark cluster
@@ -48,40 +38,71 @@ object Consumer {
 
     val processedStream = kafkaDStream.map { record =>
 
+      val rowKey = record.key()
       val xml = XML.loadString(record.value())
-      val postid = xml.attribute("PostId").getOrElse(0).toString.toInt
-      val date = xml.attribute("CreationDate").getOrElse("0001-01-01").toString
-      val score = xml.attribute("Score").getOrElse(-1).toString.toInt
-
-      val text = xml.attribute("Text").getOrElse("N/A").toString
-      val nlp = SentimentAnalysis.detectSentiment(text)
-
-      Comment(postid, score, nlp.toString, text)
+      rowKey match {
+        case "Comment" => processComments(rowKey, xml)
+        case "Post" => processPosts(rowKey, xml)
+      }
     }
     processedStream
   }
 
 
-  import spark.implicits._
+//  import spark.implicits._ //4 TODO! Replace with S3 URL
+  def saveAsCsv(topic1: String, topic2: String, kafkaParams: Map[String, Object], path: String): Unit = {
+    var rddNumber = 1
+    readFromKafka(topic1, topic2, kafkaParams).foreachRDD { rdd =>
 
-  def saveAsCsv(path: String): Unit = { //4 TODO! Replace with S3 URL
-    readFromKafka().foreachRDD { rdd =>
-      val ds = spark.createDataset(rdd) // encoder required (Encoders.product[Class]) or import spark.implicits._
+      if (rdd.map(_.rowKey).toString() == "Post") {
+        val castRDD = rdd.asInstanceOf[RDD[Post]]
 
-      ds.write.csv(path)
+        val ds = spark.createDataset(castRDD)(Encoders.product[Post])
+
+        ds.write.csv(s"$path/$rddNumber")
+        rddNumber += 1
+      }
+      else {
+        val castRDD = rdd.asInstanceOf[RDD[Comment]]
+        val ds = spark.createDataset(castRDD)(Encoders.product[Comment])
+
+        ds.write.csv(s"$path/$rddNumber")
+        rddNumber += 1
+      }
     }
   }
 
 
   def main(args: Array[String]): Unit = {
 
+    //    //1 TODO - replace parameters below with args
+    //    if (args.length != 2) {
+    //      println("Need 1) Kafka host   2) S3 output")
+    //      System.exit(1)
+    //    }
+
+    val KAFKA_HOST = "localhost" //args(0) //
+    val KAFKA_PORT = "9092"
+    val KAFKA_TOPIC1 = "comment-analyzer"
+    val KAFKA_TOPIC2 = "post-analyzer"
+        val OUTPUT = "/home/marek/Repos/Comments-analyzer/src/main/resources/comment" //args(1)
+
+
+    val KAFKA_PARAMS: Map[String, Object] = Map(
+      "bootstrap.servers" -> s"$KAFKA_HOST:$KAFKA_PORT",
+      "key.deserializer" -> classOf[StringDeserializer],
+      "value.deserializer" -> classOf[StringDeserializer],
+      "auto.offset.reset" -> "latest",
+      "enable.auto.commit" -> false.asInstanceOf[Object]
+    )
+
     println("Processing about to start")
-    readFromKafka().print(1000)
+    readFromKafka(KAFKA_TOPIC1, KAFKA_TOPIC2, KAFKA_PARAMS).print(1000)
+//        saveAsCsv(KAFKA_TOPIC1,KAFKA_TOPIC2, KAFKA_PARAMS, OUTPUT)
 
     ssc.start()
     ssc.awaitTermination()
 
   }
-
-
 }
+

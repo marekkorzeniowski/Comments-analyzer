@@ -24,11 +24,11 @@ resolvers ++= Seq(
 )
 
 libraryDependencies ++= Seq(
-  "org.apache.spark" %% "spark-core" % sparkVersion % "provided",
-  "org.apache.spark" %% "spark-sql" % sparkVersion % "provided",
+  "org.apache.spark" %% "spark-core" % sparkVersion, // % "provided",
+  "org.apache.spark" %% "spark-sql" % sparkVersion , // % "provided",
 
   // streaming
-  "org.apache.spark" %% "spark-streaming" % sparkVersion % "provided",
+  "org.apache.spark" %% "spark-streaming" % sparkVersion, //  % "provided",
 
   // streaming-kafka
   "org.apache.spark" % "spark-sql-kafka-0-10_2.12" % sparkVersion,

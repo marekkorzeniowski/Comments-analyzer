@@ -1,0 +1,35 @@
+ZMIEŃ KATALOG
+cd kafka_2.12-2.5.0
+
+WYKONAJ - terminal 1 - start zookeepera
+bin/zookeeper-server-start.sh config/zookeeper.properties
+
+WYKONAJ - terminal 2 - start serwera kafki
+bin/kafka-server-start.sh config/server.properties
+
+WYKONAJ - terminal 3 - stworzenie tematu 1
+bin/kafka-topics.sh --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1 --topic comment-analyzer
+
+WYKONAJ - terminal 3 - stworzenie tematu 2
+bin/kafka-topics.sh --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1 --topic topic2
+
+WYKONAJ - terminal 3 - producer - wysyłanie wiadomości
+bin/kafka-console-producer.sh --broker-list localhost:9092 --topic topic1
+
+WYKONAJ - terminal 4 - consumer - odbieranie wiadomości
+bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic comment-analyzer --from-beginning
+
+
+
+
+###
+DODATKOWE POLECENIA
+
+SPRAWDZANIE TEMATÓW
+bin/kafka-topics.sh --list --bootstrap-server localhost:9092
+
+INFORMACJE O TEMACIE
+bin/kafka-topics.sh --describe --bootstrap-server localhost:9092 --topic topic1
+
+USUWANIE TEMATU
+bin/kafka-topics.sh --delete --bootstrap-server localhost:9092 --topic topic1

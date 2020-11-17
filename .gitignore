@@ -208,3 +208,6 @@ spark-warehouse/
 checkpoints
 checkpoints/
 src/main/resources/twitter4j.properties
+notes.txt
+playground/
+data/
