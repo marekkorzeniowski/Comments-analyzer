@@ -51,11 +51,11 @@ libraryDependencies ++= Seq(
 
   // kafka
   "org.apache.kafka" %% "kafka" % kafkaVersion,
-  "org.apache.kafka" % "kafka-streams" % kafkaVersion
+  "org.apache.kafka" % "kafka-streams" % kafkaVersion,
 
 
   //spark-xml-parser
-//  "com.databricks"%"spark-xml_2.12"%"0.6.0"
+  "com.databricks"%"spark-xml_2.12"%"0.6.0"
 
 )
 

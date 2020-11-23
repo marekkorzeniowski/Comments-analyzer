@@ -1,12 +1,13 @@
 package Common
 
 import NLP.SentimentAnalysis
+import Spark_App.Consumer.spark
+import org.apache.spark.sql.Encoders
+import org.apache.spark.streaming.dstream.DStream
 
 import scala.xml.Elem
 
-abstract class PostObject (val rowKey: String) extends Product with Serializable
-
-case class Post (override val rowKey: String,
+case class Post (rowKey: String,
                  postId: Long,
                  postTypeId: Int,
                  parentId: Int,
@@ -21,7 +22,27 @@ case class Post (override val rowKey: String,
                  answerCount: Int,
                  commentCount: Int,
                  favoriteCount: Int
-               ) extends PostObject (rowKey)
+               )
+
+case class PostWithLocation (rowKey: String,
+                             postId: Long,
+                             postTypeId: Int,
+                             parentId: Int,
+                             creationDateTime: String,
+                             score: Int,
+                             viewCount: Long,
+                             title: String,
+                             sentiment: String,
+                             body: String,
+                             ownerUserId: Long,
+                             tags: String,
+                             answerCount: Int,
+                             commentCount: Int,
+                             favoriteCount: Int,
+                             userName: String,
+                             location: String
+                )
+
 
 object Post {
   def processPosts(rowKey: String ,xmlRecord: Elem): Post = {
@@ -44,9 +65,11 @@ object Post {
     val commentCount = xmlRecord.attribute("CommentCount").getOrElse(-1).toString.toInt
     val favoriteCount = xmlRecord.attribute("FavoriteCount").getOrElse(-1).toString.toInt
 
+
     Post(rowKey, postId, postTypeId, parentId, creationDateTime, score,
-      viewCount, parsedTitle, sentiment, parsedBody, ownerUserId,
-      parsedTags, answerCount, commentCount, favoriteCount)
+        viewCount, parsedTitle, sentiment, parsedBody, ownerUserId,
+        parsedTags, answerCount, commentCount, favoriteCount)
+
   }
 
   def parseBody(body: String): String = {
@@ -61,5 +84,16 @@ object Post {
     .replace("&gt;", " ")
     .replaceAll("\\s+", " ")
 
-  def replaceQuotes(text: String) = text.replaceAll("&quot;", "\"")
+  def replaceQuotes(text: String) = text.replaceAll("&quot;", "'")
+
+  def savePostAsCsv(dStream: DStream[PostWithLocation], path: String): Unit = {
+    var rddNumber = 1
+    dStream.foreachRDD { rdd =>
+
+      val ds = spark.createDataset(rdd)(Encoders.product[PostWithLocation])
+
+      ds.write.csv(s"$path/$rddNumber")
+      rddNumber += 1
+    }
+  }
 }

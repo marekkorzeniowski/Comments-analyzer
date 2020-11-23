@@ -4,7 +4,9 @@ import java.util.Properties
 import scala.io.Source
 import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord}
 
-object Producer extends App{
+object Producer {
+
+  val BREAK_TIME = 100
 
   def dataProducer(): Unit = {
        new Thread(
@@ -22,7 +24,7 @@ object Producer extends App{
 
            val props = new Properties()
            props.put("bootstrap.servers", s"$KAFKA_HOST:$KAFKA_PORT")
-           props.put("client.id", "ScalaProducerExample")
+           props.put("client.id", "Producer_1")
            props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer")
            props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer")
 
@@ -33,7 +35,7 @@ object Producer extends App{
            lines.foreach { line =>
              val data = new ProducerRecord[String, String](KAFKA_TOPIC, ROW_KEY, line)
              producer.send(data)
-             Thread.sleep(1000)
+             Thread.sleep(BREAK_TIME)
            }
            producer.close()
            println("Second thread finished")
@@ -54,7 +56,7 @@ object Producer extends App{
 
         val props = new Properties()
         props.put("bootstrap.servers", s"$KAFKA_HOST:$KAFKA_PORT")
-        props.put("client.id", "ScalaProducerExample")
+        props.put("client.id", "Producer_2")
         props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer")
         props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer")
 
@@ -65,7 +67,7 @@ object Producer extends App{
         lines.foreach { line =>
           val data = new ProducerRecord[String, String](KAFKA_TOPIC, ROW_KEY, line)
           producer.send(data)
-          Thread.sleep(1000)
+          Thread.sleep(BREAK_TIME)
         }
         producer.close()
         println("Third thread finished")
