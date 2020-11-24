@@ -3,7 +3,6 @@ package Spark_App
 import Common.Comment.{processComments, saveCommentAsCsv}
 import Common.Post.{processPosts, savePostAsCsv}
 import Common._
-import Kafka.Producer
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.apache.spark.sql.{Dataset, SparkSession}
 import org.apache.spark.streaming.dstream.DStream
@@ -110,19 +109,28 @@ object Consumer {
 
   def main(args: Array[String]): Unit = {
 
-    //    //1 TODO - replace parameters below with args
-    //    if (args.length != 2) {
-    //      println("Need 1) Kafka host   2) S3 output")
-    //      System.exit(1)
-    //    }
+        //1 TODO - replace parameters below with args
+        if (args.length != 6) {
+          println(
+            """
+              |Required parameters:
+              |1) Kafka host
+              |2) Topic 1
+              |3) Topic 2
+              |4) User directory
+              |5) Output for Comments
+              |6) Output for Posts
+              |""".stripMargin)
+          System.exit(1)
+        }
 
-    val KAFKA_HOST = "localhost" //args(0) //
+    val KAFKA_HOST = args(0) //   "localhost" //
     val KAFKA_PORT = "9092"
-    val KAFKA_TOPIC1 = "comment-analyzer"  //args(1)
-    val KAFKA_TOPIC2 = "post-analyzer"    //args(2)
-    val USERS_DF = "/home/marek/Repos/Comments-analyzer/src/main/resources/data/users_parquet"  //args(3)
-    val OUTPUT1 = "/home/marek/Repos/Comments-analyzer/src/main/resources/comments" //args(4)
-    val OUTPUT2 = "/home/marek/Repos/Comments-analyzer/src/main/resources/posts" //args(5)
+    val KAFKA_TOPIC1 = args(1)  // "comment-analyzer"  //
+    val KAFKA_TOPIC2 = args(2)   // "post-analyzer"    //
+    val USERS_DF = args(3)  // "/home/marek/Repos/Comments-analyzer/src/main/resources/data/users_parquet"  //
+    val OUTPUT1 = args(4)   //"/home/marek/Repos/Comments-analyzer/src/main/resources/comments" //
+    val OUTPUT2 = args(5) // "/home/marek/Repos/Comments-analyzer/src/main/resources/posts" //
 
 
 
@@ -138,19 +146,20 @@ object Consumer {
 
     import spark.implicits._
     val users = spark.read.parquet(USERS_DF).as[(Long, User)]
-    Producer.dataProducer()                   // TODO - remove in remote version
+
+//    Producer.dataProducer()                   // TODO - remove in remote version
 
 
     val dStream1 = readFromKafkaComments(KAFKA_TOPIC1, KAFKA_PARAMS)
     val joinedDStream1 = joinCommentsWithStaticData(dStream1, users)
-    joinedDStream1.print(1000)
+//    joinedDStream1.print(1000)
 
     saveCommentAsCsv(dStream1, OUTPUT1)
 
 
     val dStream2 = readFromKafkaPosts(KAFKA_TOPIC2, KAFKA_PARAMS)
     val joinedDStream2 = joinPostsWithStaticData(dStream2, users)
-    joinedDStream2.print(1000)
+//    joinedDStream2.print(1000)
 
     savePostAsCsv(joinedDStream2, OUTPUT2)
 

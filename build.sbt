@@ -1,8 +1,3 @@
-//name := "Comments-analyzer"
-//
-//version := "0.1"
-//
-//scalaVersion := "2.12.10"
 lazy val root = (project in file(".")).
   settings(
     name := "Comments-analyzer",
@@ -24,11 +19,11 @@ resolvers ++= Seq(
 )
 
 libraryDependencies ++= Seq(
-  "org.apache.spark" %% "spark-core" % sparkVersion, // % "provided",
-  "org.apache.spark" %% "spark-sql" % sparkVersion , // % "provided",
+  "org.apache.spark" %% "spark-core" % sparkVersion % "provided",
+  "org.apache.spark" %% "spark-sql" % sparkVersion % "provided",
 
   // streaming
-  "org.apache.spark" %% "spark-streaming" % sparkVersion, //  % "provided",
+  "org.apache.spark" %% "spark-streaming" % sparkVersion  % "provided",
 
   // streaming-kafka
   "org.apache.spark" % "spark-sql-kafka-0-10_2.12" % sparkVersion,
@@ -55,7 +50,7 @@ libraryDependencies ++= Seq(
 
 
   //spark-xml-parser
-  "com.databricks"%"spark-xml_2.12"%"0.6.0"
+//  "com.databricks"%"spark-xml_2.12"%"0.6.0"
 
 )
 
