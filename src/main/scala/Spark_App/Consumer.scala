@@ -154,7 +154,7 @@ object Consumer {
     val joinedDStream1 = joinCommentsWithStaticData(dStream1, users)
 //    joinedDStream1.print(1000)
 
-    saveCommentAsCsv(dStream1, OUTPUT1)
+    saveCommentAsCsv(joinedDStream1, OUTPUT1)
 
 
     val dStream2 = readFromKafkaPosts(KAFKA_TOPIC2, KAFKA_PARAMS)

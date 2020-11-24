@@ -46,11 +46,11 @@ object Comment {
     Comment(rowKey, commentId, postId, score, sentiment, parsedText, dateTime, userId)
   }
 
-  def saveCommentAsCsv(dStream: DStream[Comment], path: String): Unit = {
+  def saveCommentAsCsv(dStream: DStream[CommentWithLocation], path: String): Unit = {
     var rddNumber = 1
     dStream.foreachRDD { rdd =>
 
-      val ds = spark.createDataset(rdd)(Encoders.product[Comment])
+      val ds = spark.createDataset(rdd)(Encoders.product[CommentWithLocation])
 
       ds.write.csv(s"$path/$rddNumber")
       rddNumber += 1
