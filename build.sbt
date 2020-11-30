@@ -3,7 +3,7 @@ lazy val root = (project in file(".")).
     name := "Comments-analyzer",
     version := "1.0",
     scalaVersion := "2.12.10",
-    mainClass in Compile := Some("Spark_App.Consumer")
+    mainClass in Compile := Some("playground.Post_Processing")
   )
 
 val sparkVersion = "3.0.0"
@@ -11,6 +11,7 @@ val sparkVersion = "3.0.0"
 val kafkaVersion = "2.4.0"
 val log4jVersion = "2.4.1"
 val nlpLibVersion = "3.5.1"
+val hadoopVersion = "3.2.1"
 
 resolvers ++= Seq(
   "bintray-spark-packages" at "https://dl.bintray.com/spark-packages/maven",
@@ -19,11 +20,14 @@ resolvers ++= Seq(
 )
 
 libraryDependencies ++= Seq(
-  "org.apache.spark" %% "spark-core" % sparkVersion % "provided",
-  "org.apache.spark" %% "spark-sql" % sparkVersion % "provided",
+  //hadoop-client
+  "org.apache.hadoop" % "hadoop-client" % hadoopVersion,// % "provided",
+
+  "org.apache.spark" %% "spark-core" % sparkVersion,// % "provided",
+  "org.apache.spark" %% "spark-sql" % sparkVersion,// % "provided",
 
   // streaming
-  "org.apache.spark" %% "spark-streaming" % sparkVersion  % "provided",
+  "org.apache.spark" %% "spark-streaming" % sparkVersion,// % "provided",
 
   // streaming-kafka
   "org.apache.spark" % "spark-sql-kafka-0-10_2.12" % sparkVersion,
@@ -49,8 +53,8 @@ libraryDependencies ++= Seq(
   "org.apache.kafka" % "kafka-streams" % kafkaVersion,
 
 
-  //spark-xml-parser
-//  "com.databricks"%"spark-xml_2.12"%"0.6.0"
+//  //spark-xml-parser
+  "com.databricks"%"spark-xml_2.12"%"0.6.0"
 
 )
 

@@ -36,6 +36,7 @@ object SentimentAnalysis {
       else sentiments.sum / sentiments.length // average
 
     SentimentType.fromScore(avgSentiment)
+
   }
 }
 

@@ -16,7 +16,6 @@ object Consumer {
   val spark: SparkSession = SparkSession
     .builder()
     .appName("comment-analyzer")
-    .master("local[2]") //2 TODO local[2] = appropriate for aws?
     .getOrCreate()
 
   val ssc = new StreamingContext(spark.sparkContext, Seconds(5))
