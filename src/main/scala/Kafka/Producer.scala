@@ -6,7 +6,7 @@ import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord}
 
 object Producer {
 
-  val BREAK_TIME = 10
+  val BREAK_TIME = 1
 
   def dataProducer(): Unit = {
        new Thread(
@@ -18,7 +18,7 @@ object Producer {
            val KAFKA_TOPIC = "comment-analyzer"
            val ROW_KEY = "Comment"
 
-           val FILE_PATH1 = "/home/marek/Repos/Comments-analyzer/src/main/resources/data/Comments.xml"
+           val FILE_PATH1 = "src/main/resources/data/Comments.xml"
 
 
 
@@ -50,7 +50,7 @@ object Producer {
         val KAFKA_TOPIC = "post-analyzer"
         val ROW_KEY = "Post"
 
-        val FILE_PATH2 = "/home/marek/Repos/Comments-analyzer/src/main/resources/data/Posts.xml"
+        val FILE_PATH2 = "src/main/resources/data/Posts.xml"
 
 
 

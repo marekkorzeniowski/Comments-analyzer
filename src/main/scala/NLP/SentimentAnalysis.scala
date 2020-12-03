@@ -1,43 +1,35 @@
 package NLP
 
-import java.util.Properties
+import Main.Consumer.spark
+import org.apache.spark.broadcast.Broadcast
 
-import edu.stanford.nlp.ling.CoreAnnotations
-import edu.stanford.nlp.neural.rnn.RNNCoreAnnotations
-import edu.stanford.nlp.pipeline.StanfordCoreNLP
-import edu.stanford.nlp.sentiment.SentimentCoreAnnotations
-import edu.stanford.nlp.util.CoreMap
-
-import scala.collection.JavaConverters._
+import scala.io.Source
 
 object SentimentAnalysis {
 
-  def createNlpProps() = {
-    val props = new Properties()
-    props.setProperty("annotators", "tokenize, ssplit, pos, lemma, parse, sentiment")
-    props
+  def readWords(path: String): Broadcast[Map[String, Int]] = {
+    val mapOfWords = Source.fromFile(path)
+      .getLines().toVector.map(_.split(","))
+      .map(array => (array(0), array(1).toInt)).toMap
+
+    spark.sparkContext.broadcast(mapOfWords)
   }
 
-  def detectSentiment(message: String): SentimentType = {
-    val pipeline = new StanfordCoreNLP(createNlpProps())
-    val annotation = pipeline.process(message) // all the scores attached to this message
+  def tokenizer(text: String, lexicon: Broadcast[Map[String, Int]]): Array[(String, Int)] = {
+    text.split("\\s+")
+      .map(word =>
+      word.replaceAll("\\W", "").replaceAll("\\d", "").toLowerCase)
+      .filter(_.length != 0)
+      .map {
+        case token => (token, lexicon.value.getOrElse(token, 0))
 
-    // split the text into sentences and attach scores to each
-    val sentences = annotation.get(classOf[CoreAnnotations.SentencesAnnotation]).asScala
-    val sentiments = sentences.map { sentence: CoreMap =>
-      val tree = sentence.get(classOf[SentimentCoreAnnotations.AnnotatedTree])
-      // convert the score to a double for each sentence
-      RNNCoreAnnotations.getPredictedClass(tree).toDouble
-    }
-
-    // average out all the sentiments detected in this text
-    val avgSentiment =
-      if (sentiments.isEmpty) -1 // Not understood
-      else sentiments.sum / sentiments.length // average
-
-    SentimentType.fromScore(avgSentiment)
-
+      }
   }
+
+  def calculateAvgScore(tokens: Array[(String, Int)]) = {
+    val score = tokens.foldLeft(0.0) { (acc, tuple) => acc + tuple._2 }
+
+    score / tokens.length
+  }
+
 }
-
-

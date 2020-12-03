@@ -3,11 +3,10 @@ lazy val root = (project in file(".")).
     name := "Comments-analyzer",
     version := "1.0",
     scalaVersion := "2.12.10",
-    mainClass in Compile := Some("playground.Post_Processing")
+    mainClass in Compile := Some("Main.Consumer")
   )
 
 val sparkVersion = "3.0.0"
-//val cassandraConnectorVersion = "2.4.2"
 val kafkaVersion = "2.4.0"
 val log4jVersion = "2.4.1"
 val nlpLibVersion = "3.5.1"
@@ -36,11 +35,6 @@ libraryDependencies ++= Seq(
   "org.apache.spark" %% "spark-streaming-kafka-0-10" % sparkVersion,
   "org.apache.spark" %% "spark-streaming-kinesis-asl" % sparkVersion,
 
-
-  // cassandra - this version officially works with Spark 2.4, but tested with Spark 3.0-preview as well
-//  "com.datastax.spark" %% "spark-cassandra-connector" % cassandraConnectorVersion,
-
-
   // logging
   "org.apache.logging.log4j" % "log4j-api" % log4jVersion,
   "org.apache.logging.log4j" % "log4j-core" % log4jVersion,
@@ -51,7 +45,6 @@ libraryDependencies ++= Seq(
   // kafka
   "org.apache.kafka" %% "kafka" % kafkaVersion,
   "org.apache.kafka" % "kafka-streams" % kafkaVersion,
-
 
 //  //spark-xml-parser
   "com.databricks"%"spark-xml_2.12"%"0.6.0"
