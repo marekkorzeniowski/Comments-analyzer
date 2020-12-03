@@ -2,7 +2,6 @@ package NLP
 
 import Main.Consumer.spark
 import org.apache.spark.broadcast.Broadcast
-
 import scala.io.Source
 
 object SentimentAnalysis {
@@ -31,5 +30,4 @@ object SentimentAnalysis {
 
     score / tokens.length
   }
-
 }
