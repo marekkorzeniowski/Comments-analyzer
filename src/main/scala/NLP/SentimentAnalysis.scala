@@ -2,13 +2,14 @@ package NLP
 
 import Main.Consumer.spark
 import org.apache.spark.broadcast.Broadcast
-import scala.io.Source
 
 object SentimentAnalysis {
 
   def readWords(path: String): Broadcast[Map[String, Int]] = {
-    val mapOfWords = Source.fromFile(path)
-      .getLines().toVector.map(_.split(","))
+
+    val rddOfWords = spark.sparkContext.textFile(path)
+
+    val mapOfWords = rddOfWords.collect().map(_.split(","))
       .map(array => (array(0), array(1).toInt)).toMap
 
     spark.sparkContext.broadcast(mapOfWords)

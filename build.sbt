@@ -39,8 +39,8 @@ libraryDependencies ++= Seq(
   "org.apache.logging.log4j" % "log4j-api" % log4jVersion,
   "org.apache.logging.log4j" % "log4j-core" % log4jVersion,
 
-  "edu.stanford.nlp" % "stanford-corenlp" % nlpLibVersion,
-  "edu.stanford.nlp" % "stanford-corenlp" % nlpLibVersion classifier "models",
+//  "edu.stanford.nlp" % "stanford-corenlp" % nlpLibVersion,
+//  "edu.stanford.nlp" % "stanford-corenlp" % nlpLibVersion classifier "models",
 
   // kafka
   "org.apache.kafka" %% "kafka" % kafkaVersion,

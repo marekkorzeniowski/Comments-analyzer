@@ -4,7 +4,7 @@ import java.io.{BufferedWriter, File, FileWriter}
 
 import scala.io.Source
 
-object ExtractLexicon extends App {
+object ExtractLexicon {
 
   val positive_words =
     Source.fromFile("src/main/scala/POC/positive_words.txt").getLines().toVector
