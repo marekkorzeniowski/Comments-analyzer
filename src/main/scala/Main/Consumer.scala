@@ -67,17 +67,17 @@ object Consumer {
     val joinedDStream1 = Comment.joinCommentsWithStaticData(dStream1, users)
 //    joinedDStream1.print(1000)
 
-    Comment.saveCommentAsCsv(joinedDStream1, OUTPUT1)
+//    Comment.saveCommentAsCsv(joinedDStream1, OUTPUT1)
     val commentsPathParquet = "/home/marek/Repos/Comments-analyzer/src/main/resources/comments_parquet"
     Comment.saveCommentAsParquet(joinedDStream1, commentsPathParquet)
 
-    val dStream2 = Post.readFromKafkaPosts(KAFKA_TOPIC2, KAFKA_PARAMS, lexicon)
-    val joinedDStream2 = Post.joinPostsWithStaticData(dStream2, users)
-//    joinedDStream2.print(1000)
-
-    Post.savePostAsCsv(joinedDStream2, OUTPUT2)
-    val postsPathParquet = "/home/marek/Repos/Comments-analyzer/src/main/resources/posts_parquet"
-    Post.savePostAsParquet(joinedDStream2, postsPathParquet)
+//    val dStream2 = Post.readFromKafkaPosts(KAFKA_TOPIC2, KAFKA_PARAMS, lexicon)
+//    val joinedDStream2 = Post.joinPostsWithStaticData(dStream2, users)
+////    joinedDStream2.print(1000)
+//
+////    Post.savePostAsCsv(joinedDStream2, OUTPUT2)
+//    val postsPathParquet = "/home/marek/Repos/Comments-analyzer/src/main/resources/posts_parquet"
+//    Post.savePostAsParquet(joinedDStream2, postsPathParquet)
 
     ssc.start()
     ssc.awaitTermination()

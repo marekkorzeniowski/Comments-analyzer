@@ -7,6 +7,7 @@ import org.apache.spark.sql.{Dataset, Encoders}
 import org.apache.spark.streaming.dstream.DStream
 import org.apache.spark.streaming.kafka010.{ConsumerStrategies, KafkaUtils, LocationStrategies}
 
+import java.sql.Timestamp
 import scala.xml.{Elem, XML}
 
 case class Comment(rowKey: String,
@@ -15,7 +16,7 @@ case class Comment(rowKey: String,
                   score: Int,
                   sentiment: String,
                   text: String,
-                  creationDate: String,
+                  creationDate: Timestamp,
                   userId: Long
                   )
 
@@ -25,7 +26,7 @@ case class CommentWithLocation(rowKey: String,
                                score: Int,
                                sentiment: String,
                                text: String,
-                               creationDate: String,
+                               creationDate: Timestamp,
                                userId: Long,
                                userName: String,
                                location: String)
@@ -39,6 +40,7 @@ object Comment {
     val commentId = xmlRecord.attribute("Id").getOrElse(-1).toString.toLong
     val postId = xmlRecord.attribute("PostId").getOrElse(0).toString.toLong
     val dateTime = xmlRecord.attribute("CreationDate").getOrElse("0001-01-01T00:00:00.000").toString
+    val timeStamp = Common.getTimeStampFromString(dateTime)
     val score = xmlRecord.attribute("Score").getOrElse(-1).toString.toInt
     val text = xmlRecord.attribute("Text").getOrElse("N/A").toString
     val parsedText = Common.parseTitle(text)
@@ -47,7 +49,7 @@ object Comment {
     val sentiment = SentimentType.fromScore(avgScore).toString
     val userId = xmlRecord.attribute("UserId").getOrElse(-1).toString.toLong
 
-    Comment(rowKey, commentId, postId, score, sentiment, parsedText, dateTime, userId)
+    Comment(rowKey, commentId, postId, score, sentiment, parsedText, timeStamp, userId)
   }
 
 
