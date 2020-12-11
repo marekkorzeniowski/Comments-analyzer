@@ -41,8 +41,8 @@ object Consumer {
     val KAFKA_TOPIC2 = "post-analyzer"    // args(2)   //
     val USERS_DF = "src/main/resources/data/users_parquet"  // args(3)  //
     val LEXICON = "src/main/resources/data/positive_and_negative_words.txt" //args(4)   //
-    val OUTPUT1 = "/home/marek/Repos/Comments-analyzer/src/main/resources/comments_stream" //args(5)   //
-    val OUTPUT2 =  "/home/marek/Repos/Comments-analyzer/src/main/resources/posts_stream" //args(6) //
+    val OUTPUT1 = "/home/marek/Repos/Comments-analyzer/src/main/resources/comments_csv" //args(5)   //
+    val OUTPUT2 =  "/home/marek/Repos/Comments-analyzer/src/main/resources/posts_csv" //args(6) //
 
 
     val KAFKA_PARAMS: Map[String, Object] = Map(
@@ -68,13 +68,16 @@ object Consumer {
 //    joinedDStream1.print(1000)
 
     Comment.saveCommentAsCsv(joinedDStream1, OUTPUT1)
-
+    val commentsPathParquet = "/home/marek/Repos/Comments-analyzer/src/main/resources/comments_parquet"
+    Comment.saveCommentAsParquet(joinedDStream1, commentsPathParquet)
 
     val dStream2 = Post.readFromKafkaPosts(KAFKA_TOPIC2, KAFKA_PARAMS, lexicon)
     val joinedDStream2 = Post.joinPostsWithStaticData(dStream2, users)
 //    joinedDStream2.print(1000)
 
     Post.savePostAsCsv(joinedDStream2, OUTPUT2)
+    val postsPathParquet = "/home/marek/Repos/Comments-analyzer/src/main/resources/posts_parquet"
+    Post.savePostAsParquet(joinedDStream2, postsPathParquet)
 
     ssc.start()
     ssc.awaitTermination()

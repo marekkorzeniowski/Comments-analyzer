@@ -1,5 +1,8 @@
 package Common
 
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+
 object Common {
 
   def parseBody(body: String): String = {
@@ -14,14 +17,20 @@ object Common {
   }
 
   def parseTags(tags: String): String =  tags
+    .replace("&gt;&lt;", "|")
     .replace("&lt;", "")
-    .replace("&gt;", " ")
+    .replace("&gt;", "")
     .replaceAll("\\s+", " ")
 
-  def parseTitle(text: String) =
+  def parseTitle(text: String): String =
     text.replaceAll("&quot;", "'")
       .replaceAll("\\s+", " ")
       .replaceAll("&amp;", "")
 
+  def getCurrentTimeStamp: String = {
+    val format = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm:ss")
+
+    LocalDateTime.now().format(format)
+  }
 
 }

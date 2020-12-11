@@ -94,9 +94,20 @@ object Comment {
     dStream.foreachRDD { rdd =>
 
       val ds = spark.createDataset(rdd)(Encoders.product[CommentWithLocation])
+      val timeStamp = Common.getCurrentTimeStamp
 
-      val timeStamp = System.currentTimeMillis()
-      ds.write.csv(s"$path/$timeStamp")
+      ds.write.option("header", true).option("delimiter", "@#$").csv(s"$path/dt=$timeStamp")
+    }
+  }
+
+  def saveCommentAsParquet(dStream: DStream[CommentWithLocation], path: String): Unit = {
+
+    dStream.foreachRDD { rdd =>
+
+      val ds = spark.createDataset(rdd)(Encoders.product[CommentWithLocation])
+      val timeStamp = Common.getCurrentTimeStamp
+
+      ds.write.parquet(s"$path/dt=$timeStamp")
     }
   }
 }

@@ -125,8 +125,19 @@ object Post {
 
       val ds = spark.createDataset(rdd)(Encoders.product[PostWithLocation])
 
-      val timeStamp = System.currentTimeMillis()
-      ds.write.csv(s"$path/$timeStamp")
+      val timeStamp = Common.getCurrentTimeStamp
+      ds.write.option("header", true).option("delimiter", "@#$").csv(s"$path/dt=$timeStamp")
+    }
+  }
+
+  def savePostAsParquet(dStream: DStream[PostWithLocation], path: String): Unit = {
+
+    dStream.foreachRDD { rdd =>
+
+      val ds = spark.createDataset(rdd)(Encoders.product[PostWithLocation])
+
+      val timeStamp = Common.getCurrentTimeStamp
+      ds.write.parquet(s"$path/dt=$timeStamp")
     }
   }
 }
