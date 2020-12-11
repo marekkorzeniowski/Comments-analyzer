@@ -7,13 +7,14 @@ import org.apache.spark.sql.{Dataset, Encoders}
 import org.apache.spark.streaming.dstream.DStream
 import org.apache.spark.streaming.kafka010.{ConsumerStrategies, KafkaUtils, LocationStrategies}
 
+import java.sql.Timestamp
 import scala.xml.{Elem, XML}
 
 case class Post (rowKey: String,
                  postId: Long,
                  postTypeId: Long,
                  parentId: Long,
-                 creationDateTime: String,
+                 creationDateTime: Timestamp,
                  score: Long,
                  viewCount: Long,
                  title: String,
@@ -29,7 +30,7 @@ case class PostWithLocation (rowKey: String,
                              postId: Long,
                              postTypeId: Long,
                              parentId: Long,
-                             creationDateTime: String,
+                             creationDateTime: Timestamp,
                              score: Long,
                              viewCount: Long,
                              title: String,
@@ -52,6 +53,7 @@ object Post {
     val postTypeId = xmlRecord.attribute("PostTypeId").getOrElse(-1).toString.toInt
     val parentId = xmlRecord.attribute("ParentID").getOrElse(-1).toString.toInt
     val creationDateTime = xmlRecord.attribute("CreationDate").getOrElse("0001-01-01T00:00:00.000").toString
+    val timeStamp = Common.getTimeStampFromString(creationDateTime)
     val score = xmlRecord.attribute("Score").getOrElse(-1).toString.toInt
     val viewCount = xmlRecord.attribute("ViewCount").getOrElse(-1).toString.toLong
     val title = xmlRecord.attribute("Title").getOrElse("N/A").toString
@@ -69,7 +71,7 @@ object Post {
     val favoriteCount = xmlRecord.attribute("FavoriteCount").getOrElse(-1).toString.toInt
 
 
-    Post(rowKey, postId, postTypeId, parentId, creationDateTime, score,
+    Post(rowKey, postId, postTypeId, parentId, timeStamp, score,
         viewCount, parsedTitle, sentiment, parsedBody, ownerUserId,
         parsedTags, answerCount, commentCount, favoriteCount)
 
@@ -120,13 +122,23 @@ object Post {
   }
 
   def savePostAsCsv(dStream: DStream[PostWithLocation], path: String): Unit = {
-
     dStream.foreachRDD { rdd =>
 
       val ds = spark.createDataset(rdd)(Encoders.product[PostWithLocation])
 
       val timeStamp = System.currentTimeMillis()
-      ds.write.csv(s"$path/$timeStamp")
+      ds.write.option("header", true).option("delimiter", "@#$")
+        .csv(s"$path/$timeStamp")
+    }
+  }
+
+  def savePostAsParquet(dStream: DStream[PostWithLocation], path: String): Unit = {
+    dStream.foreachRDD { rdd =>
+
+      val ds = spark.createDataset(rdd)(Encoders.product[PostWithLocation])
+
+      val timeStamp = System.currentTimeMillis()
+      ds.write.parquet(s"$path/$timeStamp")
     }
   }
 }

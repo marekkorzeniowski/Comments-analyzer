@@ -60,13 +60,13 @@ object Consumer {
     val dStream1 = Comment.readFromKafkaComments(KAFKA_TOPIC1, KAFKA_PARAMS, lexicon)
     val joinedDStream1 = Comment.joinCommentsWithStaticData(dStream1, users)
 
-    Comment.saveCommentAsCsv(joinedDStream1, OUTPUT1)
+    Comment.saveCommentAsParquet(joinedDStream1, OUTPUT1)
 
 
     val dStream2 = Post.readFromKafkaPosts(KAFKA_TOPIC2, KAFKA_PARAMS, lexicon)
     val joinedDStream2 = Post.joinPostsWithStaticData(dStream2, users)
 
-    Post.savePostAsCsv(joinedDStream2, OUTPUT2)
+    Post.savePostAsParquet(joinedDStream2, OUTPUT2)
 
     ssc.start()
     ssc.awaitTermination()

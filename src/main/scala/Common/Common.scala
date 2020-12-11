@@ -1,5 +1,9 @@
 package Common
 
+import java.sql.Timestamp
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+
 object Common {
 
   def parseBody(body: String): String = {
@@ -23,5 +27,15 @@ object Common {
       .replaceAll("\\s+", " ")
       .replaceAll("&amp;", "")
 
+  def getCurrentTimeStamp: String = {
+    val format = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm:ss.S")
+
+    LocalDateTime.now().format(format)
+  }
+
+  def getTimeStampFromString(s: String): Timestamp = {
+    val formatted  = s.replace("T", " ")
+    Timestamp.valueOf(formatted)
+  }
 
 }
