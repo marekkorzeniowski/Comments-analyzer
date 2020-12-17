@@ -4,7 +4,7 @@ import java.util.Properties
 import scala.io.Source
 import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord}
 
-object Producer {
+object Producer { // Used Only for testing purposes
 
   val BREAK_TIME = 1
 
