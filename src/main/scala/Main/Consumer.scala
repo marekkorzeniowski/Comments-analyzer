@@ -20,7 +20,7 @@ object Consumer {
   def main(args: Array[String]): Unit = {
 
 //        //1 TODO - replace parameters below with args
-//        if (args.length != 7) {
+//        if (args.length != 8) {
 //          println(
 //            """
 //              |Required parameters:
@@ -29,8 +29,9 @@ object Consumer {
 //              |3) Topic 2
 //              |4) Users path
 //              |5) Lexicon path
-//              |6) Output for Comments
-//              |7) Output for Posts
+//              |6) Negative words
+//              |7) Output for Comments
+//              |8) Output for Posts
 //              |""".stripMargin)
 //          System.exit(1)
 //        }
@@ -40,9 +41,10 @@ object Consumer {
     val KAFKA_TOPIC1 = "comment-analyzer"  // args(1)  //
     val KAFKA_TOPIC2 = "post-analyzer"    // args(2)   //
     val USERS_DF = "src/main/resources/data/users_parquet"  // args(3)  //
-    val LEXICON = "src/main/resources/data/positive_and_negative_words.txt" //args(4)   //
-    val OUTPUT1 = "/home/marek/Repos/Comments-analyzer/src/main/resources/comments_csv" //args(5)   //
-    val OUTPUT2 =  "/home/marek/Repos/Comments-analyzer/src/main/resources/posts_csv" //args(6) //
+    val POS_WORDS = "src/main/resources/data/positive_words.txt" //args(4)   //
+    val NEG_WORDS = "src/main/resources/data/negative_words.txt" //args(4)   //
+    val OUTPUT1 = "/home/marek/Repos/Comments-analyzer/src/main/resources/comments_parquet2" //args(5)   //
+    val OUTPUT2 =  "/home/marek/Repos/Comments-analyzer/src/main/resources/posts_parquet2" //args(6) //
 
 
     val KAFKA_PARAMS: Map[String, Object] = Map(
@@ -58,33 +60,27 @@ object Consumer {
 
     import spark.implicits._
     val users = spark.read.parquet(USERS_DF).as[(Long, User)]
-    val lexicon = NLP.SentimentAnalysis.readWords(LEXICON)
+    val pos_words = NLP.SentimentAnalysis.readWords(POS_WORDS)
+    val neg_words = NLP.SentimentAnalysis.readWords(NEG_WORDS)
 
     Producer.dataProducer()                   // TODO - remove in remote version
 
-
-    val dStream1 = Comment.readFromKafkaComments(KAFKA_TOPIC1, KAFKA_PARAMS, lexicon)
+    // Comments writing
+    val dStream1 = Comment.readFromKafkaComments(KAFKA_TOPIC1, KAFKA_PARAMS, pos_words, neg_words)
     val joinedDStream1 = Comment.joinCommentsWithStaticData(dStream1, users)
-//    joinedDStream1.print(1000)
+    Comment.saveCommentAsParquet(joinedDStream1, OUTPUT1)
 
-//    Comment.saveCommentAsCsv(joinedDStream1, OUTPUT1)
-    val commentsPathParquet = "/home/marek/Repos/Comments-analyzer/src/main/resources/comments_parquet"
-    Comment.saveCommentAsParquet(joinedDStream1, commentsPathParquet)
 
-    val dStream2 = Post.readFromKafkaPosts(KAFKA_TOPIC2, KAFKA_PARAMS, lexicon)
+    //Posts writing
+    val dStream2 = Post.readFromKafkaPosts(KAFKA_TOPIC2, KAFKA_PARAMS, pos_words, neg_words)
     val joinedDStream2 = Post.joinPostsWithStaticData(dStream2, users)
-//    joinedDStream2.print(1000)
-
-//    Post.savePostAsCsv(joinedDStream2, OUTPUT2)
-    val postsPathParquet = "/home/marek/Repos/Comments-analyzer/src/main/resources/posts_parquet"
-    Post.savePostAsParquet(joinedDStream2, postsPathParquet)
+    Post.savePostAsParquet(joinedDStream2, OUTPUT2)
 
     ssc.start()
     ssc.awaitTermination()
+
     val t1 = System.nanoTime()
-
     println(s"Total time of processing: ${(t1-t0)/1e9}s")
-
   }
 }
 

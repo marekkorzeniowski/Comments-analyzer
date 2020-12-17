@@ -38,6 +38,7 @@ object Producer {
              Thread.sleep(BREAK_TIME)
            }
 
+           Thread.sleep(30000)
            producer.close()
            println("Second thread finished")
          }).start()
@@ -71,6 +72,7 @@ object Producer {
           Thread.sleep(BREAK_TIME)
         }
 
+        Thread.sleep(30000)
         producer.close()
         println("Third thread finished")
       }).start()

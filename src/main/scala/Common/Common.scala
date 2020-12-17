@@ -38,6 +38,4 @@ object Common {
     val formated  = s.replace("T", " ")
     Timestamp.valueOf(formated)
   }
-
-
 }
