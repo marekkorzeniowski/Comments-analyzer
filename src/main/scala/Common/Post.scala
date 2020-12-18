@@ -153,7 +153,7 @@ object Post {
       val ds = spark.createDataset(rdd)(Encoders.product[PostWithLocation])
 
       val timeStamp = System.currentTimeMillis()
-      ds.write.parquet(s"$path/$timeStamp")
+      ds.write.parquet(s"$path/dt=$timeStamp")
     }
   }
 }

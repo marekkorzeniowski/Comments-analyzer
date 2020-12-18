@@ -126,7 +126,7 @@ object Comment {
       val ds = spark.createDataset(rdd)(Encoders.product[CommentWithLocation])
 
       val timeStamp = Common.getCurrentTimeStamp
-      ds.write.parquet(s"$path/$timeStamp")
+      ds.write.parquet(s"$path/dt=$timeStamp")
     }
   }
 }
