@@ -152,7 +152,7 @@ object Post {
     dStream.foreachRDD { rdd =>
       val ds = spark.createDataset(rdd)(Encoders.product[PostWithLocation])
 
-      val timeStamp = System.currentTimeMillis()
+      val timeStamp = Common.getCurrentTimeStamp
       ds.write.parquet(s"$path/dt=$timeStamp")
     }
   }
