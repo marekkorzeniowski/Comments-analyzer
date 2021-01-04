@@ -22,7 +22,7 @@ object Common {
     .replace("&gt;", " ")
     .replaceAll("\\s+", " ")
 
-  def parseTitle(text: String) =
+  def parseTitle(text: String): String =
     text.replaceAll("&quot;", "'")
       .replaceAll("\\s+", " ")
       .replaceAll("&amp;", "")

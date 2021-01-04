@@ -9,7 +9,7 @@ object SentimentType {
     else if (score >= 0.05) POSITIVE
     else if (score >= -0.05) NEUTRAL
     else if (score >= -0.3) NEGATIVE
-    else if (score >= -0.5) VERY_NEGATIVE
+    else if (score >= -1) VERY_NEGATIVE
     else NOT_UNDERSTOOD
 }
 

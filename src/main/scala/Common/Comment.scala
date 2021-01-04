@@ -92,7 +92,7 @@ object Comment {
 
     val joinedDStream = dStreamTuple.transform(stream => stream.leftOuterJoin(usersRDD))
 
-    joinedDStream.map{case (id, (comment, user)) =>
+    joinedDStream.map{case (_, (comment, user)) =>
       CommentWithLocation(
         comment.rowKey,
         comment.commentId,
