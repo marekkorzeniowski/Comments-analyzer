@@ -43,8 +43,8 @@ object Consumer {
     val USERS_DF = "src/main/resources/data/users_parquet"  // args(3)  //
     val POS_WORDS = "src/main/resources/data/positive_words.txt" //args(4)   //
     val NEG_WORDS = "src/main/resources/data/negative_words.txt" //args(4)   //
-    val OUTPUT1 = "/home/marek/Repos/Comments-analyzer/src/main/resources/comments_parquet2" //args(5)   //
-    val OUTPUT2 =  "/home/marek/Repos/Comments-analyzer/src/main/resources/posts_parquet2" //args(6) //
+    val OUTPUT1 = "src/main/resources/comments_parquet2" //args(5)   //
+    val OUTPUT2 =  "src/main/resources/posts_parquet2" //args(6) //
 
 
     val KAFKA_PARAMS: Map[String, Object] = Map(

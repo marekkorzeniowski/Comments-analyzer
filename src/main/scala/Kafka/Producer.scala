@@ -8,7 +8,7 @@ object Producer {
 
   val BREAK_TIME = 1
 
-  def dataProducer(): Unit = {
+  def dataProducer(): Unit = { // Used only for testing purposes
        new Thread(
          () => {
            println("Second thread started")

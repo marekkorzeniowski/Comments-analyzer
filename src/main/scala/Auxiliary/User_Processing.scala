@@ -1,16 +1,13 @@
 package Auxiliary
 
+import Common.{User, UserID}
 import Main.Consumer.spark
 import com.databricks.spark.xml.XmlDataFrameReader
 import org.apache.spark.sql.functions.col
 
-case class UserID(id:Long, name: Option[String], location : Option[String])
-
-case class User(name: Option[String], location : Option[String])
-
 object User_Processing {
 
-  val users_source = "/home/marek/Repos/Comments-analyzer/src/main/resources/data/Users.xml"
+  val users_source = "src/main/resources/data/Users.xml"
 
   import spark.implicits._
 
@@ -24,7 +21,7 @@ object User_Processing {
     .as[UserID]
     .map(user => (user.id, User(user.name, user.location)))
 
-  val processed_users = "/home/marek/Repos/Comments-analyzer/src/main/resources/data/users_parquet"
+  val processed_users = "src/main/resources/data/users_parquet"
 
   usersDS.write.parquet(processed_users)
 }
