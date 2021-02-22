@@ -15,7 +15,7 @@ Data come from: https://ia800107.us.archive.org/27/items/stackexchange/ and was 
 Most of the steps regarding data processing are self-explanatory, however, sentiment analysis and data enrichment deserves a word of explanation.
 * Approach used in sentiment analysis is very simplistic due to efficiency reasons to handle computations in the stream manner. Presented approach utilize lexicon of positive and negative words and based on that score is assigned to each word of a statement. Overall score is average consisting of sum of all scores assigned to each word and sum of all words in a statement.
 Approach inspired by article: “Sentiment analysis and subjectivity” Bing Liu and https://datamatters.blog/2011/07/04/twitter-text-mining-r-slides/
-* Data enrichment is simply RDD join of streams to static data which add information about users like their login and locations
+* Data enrichment is simply RDD join of streams to static data which add information about users like their logins and locations
 
 
 ##### Results
