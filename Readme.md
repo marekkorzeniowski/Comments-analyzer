@@ -1,4 +1,4 @@
-#### Simple Big Data system with elements of sentiment analysis created to process stream of messages based on Apache Spark and Kafka with use of S3 and Athena.
+#### Simple Big Data system with elements of sentiment analysis created to process streams of messages based on Apache Spark and Kafka with use of S3 and Athena.
 
 ##### Aim and motivation
 University final project used as an opportunity to learn and play a bit with Spark, Kafka and AWS services.
